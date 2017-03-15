@@ -83,7 +83,6 @@ public class URLReader {
     private String parseDate(Date today) {
         SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
         String returnString = s.format(today);
-        System.out.println(returnString);
         return "?from=" + returnString;
     }
 
@@ -99,9 +98,6 @@ public class URLReader {
         ArrayList<Integer> nullNumber = new ArrayList<>();
        // lastLine = ",{\"time\":\"2017-03-15T10:52:04.363\",\"id\":\"862643032870150\",\"sq\":\"-94 \",\"batt\":\"3.85\",\"baro\":\"98355\",\"rh\":null,\"t1\":\"20.7\",\"t2\":\"31.0\",\"t3\":\"26.6\"}";
         String[] type = lastLine.split(",");
-        for (int i = 0; i < type.length; i++) {
-            System.out.println(i + " " + type[i]);
-        }
         String date = type[1].split("\"")[3];
         String data[] = new String[5];
         for (int i = 5; i < type.length; i++) {

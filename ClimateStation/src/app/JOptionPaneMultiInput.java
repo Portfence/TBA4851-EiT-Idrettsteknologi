@@ -27,8 +27,7 @@ public class JOptionPaneMultiInput {
         int result = JOptionPane.showConfirmDialog(null, myPanel,
                 "Please Enter the Athlete's info", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            System.out.println("Full Name: " + name.getText());
-            System.out.println("Area [m^2]: ");
+
         }
 
         return new String[]{name.getText(), weight.getText(),

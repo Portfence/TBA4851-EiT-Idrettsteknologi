@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -32,6 +35,7 @@ public class UserInterface extends javax.swing.JFrame {
     private long prevSeconds;
     private long prevHundreds;
     private URLReader urlReader;
+    private final DefaultTableModel initialModel;
 
     /**
      * Creates new form UserInterface
@@ -40,6 +44,8 @@ public class UserInterface extends javax.swing.JFrame {
         initComponents();
         fillDropdownBoxes();
 
+        initialModel = (DefaultTableModel) scoreboard.getModel();
+        System.out.println("IT HAPPENED");
         athleteList = new HashMap<>();
         listIndex = 0;
 
@@ -62,7 +68,7 @@ public class UserInterface extends javax.swing.JFrame {
         }
         weatherUpdateTimer();
         getAndDisplayWeatherData();
-       
+
     }
 
     private void getAndDisplayWeatherData() {
@@ -289,6 +295,11 @@ public class UserInterface extends javax.swing.JFrame {
         data_label1.setText("Speed Skater Profile");
 
         boxAthlete.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
+        boxAthlete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                boxAthleteActionPerformed(evt);
+            }
+        });
 
         submitButton.setFont(new java.awt.Font("Verdana", 0, 24)); // NOI18N
         submitButton.setText("Submit Time!");
@@ -652,7 +663,7 @@ public class UserInterface extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Number", "Distance", "Time(sec:hsec)", "Adjusted Time", "Factor", "Date", "ºC top", "ºC middle", "ºC ice", "Air Pressure", "Relative Humidity"
+                "Number", "Distance (m)", "Time(sec:hsec)", "Adjusted Time", "Factor", "Date", "ºC top", "ºC middle", "ºC ice", "Air Pressure", "Relative Humidity"
             }
         ));
         scoreboard.setRowHeight(20);
@@ -741,18 +752,33 @@ public class UserInterface extends javax.swing.JFrame {
         }
 
         String time = getTimeFromChoice();
-        String distance = (String)boxDistance.getSelectedItem();
+        String distance = (String) boxDistance.getSelectedItem();
         String biasTerm = "";
         String adjustedTime = "";
         try {
+            //System.out.println("Athlete Model: " + atl.getModel().);
             //SimpleDateFormat date = new SimpleDateFormat("E, d-M-y 'at' h:m:s a z");
-            Object[] dataModel = new Object[]{"" + (listIndex+1),distance, time, adjustedTime, biasTerm, (new Date().toString()), temp_1, temp_2, temp_3, airP, hum};
-            DefaultTableModel model = (DefaultTableModel) scoreboard.getModel();
+            Object[] dataModel = new Object[]{"" + (listIndex + 1), distance, time, adjustedTime, biasTerm, (new Date().toString()), temp_1, temp_2, temp_3, airP, hum};
+            DefaultTableModel model = atl.getModel();
             model.insertRow(listIndex, dataModel);
+
+//            int rowCount = model.getRowCount();
+//            int colCount = model.getColumnCount();
+//            Vector<Vector<Object>> copy = new Vector<>(rowCount);
+//            for (int row = 0; row < rowCount; row++) {
+//                Vector<Object> newRow = new Vector<>(colCount);
+//                copy.add(newRow);
+//                for (int col = 0; col < colCount; col++) {
+//                    newRow.add(model.getValueAt(row, col));
+//                }
+//            }
+//            DefaultTableModel c = new DefaultTableModel(copy, rowCount);
             scoreboard.setModel(model);
+            model.fireTableDataChanged();
+            atl.setModel(model);
+            athleteList.replace(atl.getName(), atl);
             listIndex++;
-            scoreboard.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-            
+
         } catch (NullPointerException npe2) {
             JOptionPane.showMessageDialog(this, "Add an athlete first", "Error", JOptionPane.OK_CANCEL_OPTION);
             listIndex--;
@@ -777,7 +803,7 @@ public class UserInterface extends javax.swing.JFrame {
         String time = "" + (localMin - prevMinutes) + ":" + (Math.abs(localSec - prevSeconds)) + ":" + (Math.abs(localHun - prevHundreds));
         DefaultTableModel model = (DefaultTableModel) roundTimeTable.getModel();
         try {
-            String[] dataModel = new String[]{"" + (roundIndex+1), time};
+            String[] dataModel = new String[]{"" + (roundIndex + 1), time};
             model.insertRow(roundIndex, dataModel);
             roundTimeTable.setModel(model);
             roundIndex++;
@@ -823,13 +849,19 @@ public class UserInterface extends javax.swing.JFrame {
             //weatherData=
             time = runAdvancedAndAwesomeAlgorithm(time, weatherData);
         }
-
         previewTimeLabel.setText(time);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void boxAthleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boxAthleteActionPerformed
+        Athlete atl = athleteList.get((String) boxAthlete.getSelectedItem());
+        DefaultTableModel personalModel = atl.getModel();
+        scoreboard.setModel(personalModel);
+
+    }//GEN-LAST:event_boxAthleteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -873,7 +905,7 @@ public class UserInterface extends javax.swing.JFrame {
         Float weight = Float.parseFloat(athleteData[1]);
         Float circumference = Float.parseFloat(athleteData[2]);
         Float legLength = Float.parseFloat(athleteData[3]);
-        Athlete athlete = new Athlete(fullName, weight, circumference, legLength);
+        Athlete athlete = new Athlete(fullName, weight, circumference, legLength, initialModel);
         athleteList.put(fullName, athlete);
         Object[] objectArr = athleteList.keySet().toArray();
         String[] stringArray = new String[objectArr.length];
@@ -966,10 +998,10 @@ public class UserInterface extends javax.swing.JFrame {
     }
 
     private void weatherUpdateTimer() {
-        Timer weatherUpdater = new Timer(30000, new ActionListener() {
+        Timer weatherUpdater = new Timer(60000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+
                 try {
                     urlReader.parseURL();
                 } catch (IOException ex) {
