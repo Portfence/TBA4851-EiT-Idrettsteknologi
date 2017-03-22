@@ -4,6 +4,7 @@ import java.net.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -30,11 +31,31 @@ public class URLReader {
     }
 
     /**
+     * incase data from today not available
+     *
+     * @param yesterday
+     * @throws MalformedURLException
+     */
+    public URLReader(boolean yesterday) throws MalformedURLException {
+        Date today = new Date();
+        String from = parseDate(yesterday());
+        String url = "http://alfeh.azurewebsites.net/get_temp_data.php" + from;
+        webData = new URL(url);
+    }
+
+    private Date yesterday() {
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        return cal.getTime();
+    }
+
+    /**
      * parses the data in the web page of the URL.
      *
+     * @return true if successfully executed
      * @throws IOException
      */
-    public void parseURL() throws IOException {
+    public boolean parseURL() throws IOException {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(webData.openStream()));
         //stores reference time for runtime
@@ -42,7 +63,11 @@ public class URLReader {
         currentLine = in.readLine();
         String lastLine;
         String[] tokens = currentLine.split("}");
-        lastLine = tokens[tokens.length - 2];
+        try {
+            lastLine = tokens[tokens.length - 2];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return false;
+        }
         Object[] objectData = extractDataFromLine(lastLine);
         weatherData = (String[]) objectData[0];
         ArrayList<Integer> nullNumbers = (ArrayList) objectData[1];
@@ -52,7 +77,7 @@ public class URLReader {
         //prints actual runtime
         System.out.println("Runtime: " + (System.currentTimeMillis() - then));
         in.close();
-
+        return true;
     }
 
     /**
@@ -96,7 +121,7 @@ public class URLReader {
     private Object[] extractDataFromLine(String lastLine) {
         String temp_1, temp_2, temp_3, pressure, relativeHum;
         ArrayList<Integer> nullNumber = new ArrayList<>();
-       // lastLine = ",{\"time\":\"2017-03-15T10:52:04.363\",\"id\":\"862643032870150\",\"sq\":\"-94 \",\"batt\":\"3.85\",\"baro\":\"98355\",\"rh\":null,\"t1\":\"20.7\",\"t2\":\"31.0\",\"t3\":\"26.6\"}";
+        // lastLine = ",{\"time\":\"2017-03-15T10:52:04.363\",\"id\":\"862643032870150\",\"sq\":\"-94 \",\"batt\":\"3.85\",\"baro\":\"98355\",\"rh\":null,\"t1\":\"20.7\",\"t2\":\"31.0\",\"t3\":\"26.6\"}";
         String[] type = lastLine.split(",");
         String date = type[1].split("\"")[3];
         String data[] = new String[5];

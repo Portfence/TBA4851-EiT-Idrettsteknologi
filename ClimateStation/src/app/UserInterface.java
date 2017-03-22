@@ -9,10 +9,8 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 /**
  *
@@ -21,7 +19,6 @@ import javax.swing.table.TableModel;
 public class UserInterface extends javax.swing.JFrame {
 
     private HashMap<String, Athlete> athleteList;
-    private int listIndex;
     private StopWatch stopWatch;
     private Timer timerUpdater;
     private boolean buttonPressed;
@@ -35,7 +32,6 @@ public class UserInterface extends javax.swing.JFrame {
     private long prevSeconds;
     private long prevHundreds;
     private URLReader urlReader;
-    private final DefaultTableModel initialModel;
 
     /**
      * Creates new form UserInterface
@@ -44,10 +40,7 @@ public class UserInterface extends javax.swing.JFrame {
         initComponents();
         fillDropdownBoxes();
 
-        initialModel = (DefaultTableModel) scoreboard.getModel();
-        System.out.println("IT HAPPENED");
         athleteList = new HashMap<>();
-        listIndex = 0;
 
         stopWatch = new StopWatch();
         readyTimer();
@@ -60,7 +53,11 @@ public class UserInterface extends javax.swing.JFrame {
 
         try {
             urlReader = new URLReader();
-            urlReader.parseURL();
+            boolean success = urlReader.parseURL();
+            if (!success) {
+                urlReader = new URLReader(true);
+                urlReader.parseURL();
+            }
         } catch (MalformedURLException ex) {
             System.out.println("Malformed URL Exception");
         } catch (IOException ex) {
@@ -68,7 +65,6 @@ public class UserInterface extends javax.swing.JFrame {
         }
         weatherUpdateTimer();
         getAndDisplayWeatherData();
-
     }
 
     private void getAndDisplayWeatherData() {
@@ -148,6 +144,8 @@ public class UserInterface extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         previewTimeLabel = new javax.swing.JLabel();
         jCheckBox1 = new javax.swing.JCheckBox();
+        referenceButton = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         scoreboard = new javax.swing.JTable();
 
@@ -509,7 +507,7 @@ public class UserInterface extends javax.swing.JFrame {
                     .addComponent(textHumidity, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(checkBox_corrector)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(previewTimeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE))
@@ -523,6 +521,22 @@ public class UserInterface extends javax.swing.JFrame {
             }
         });
 
+        referenceButton.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
+        referenceButton.setText("Submit Reference Time");
+        referenceButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                referenceButtonActionPerformed(evt);
+            }
+        });
+
+        jButton3.setFont(new java.awt.Font("Verdana", 0, 14)); // NOI18N
+        jButton3.setText("Display Selected Athlete's Reference");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -532,7 +546,17 @@ public class UserInterface extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(data_label1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(submitButton, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                            .addComponent(referenceButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(74, 74, 74)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(22, 22, 22))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(data_label1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(85, 85, 85))
                             .addComponent(boxAthlete, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -553,20 +577,17 @@ public class UserInterface extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(jCheckBox1)
                                         .addGap(0, 0, Short.MAX_VALUE)))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(timerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(129, 129, 129)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(resetButton)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(8, 8, 8))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(submitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(74, 74, 74)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(22, 22, 22)))
+                                .addGap(117, 117, 117))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(67, 67, 67)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(timerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(8, 8, 8)))))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -624,14 +645,19 @@ public class UserInterface extends javax.swing.JFrame {
                                 .addComponent(roundTimeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(submitButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(11, 11, 11)
                                 .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
-                                .addComponent(addAthleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(21, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
+                                .addComponent(addAthleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(submitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(referenceButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         scoreboard.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
@@ -725,6 +751,7 @@ public class UserInterface extends javax.swing.JFrame {
     private void addAthleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addAthleteButtonActionPerformed
         try {
             addNewAthlete();
+            JOptionPane.showMessageDialog(this, "Success! Remember to submit a reference time","Note", JOptionPane.INFORMATION_MESSAGE);
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(this, "Enter Correct Info!", "Error", JOptionPane.OK_CANCEL_OPTION);
         }
@@ -756,32 +783,19 @@ public class UserInterface extends javax.swing.JFrame {
         String biasTerm = "";
         String adjustedTime = "";
         try {
-            //System.out.println("Athlete Model: " + atl.getModel().);
-            //SimpleDateFormat date = new SimpleDateFormat("E, d-M-y 'at' h:m:s a z");
-            Object[] dataModel = new Object[]{"" + (listIndex + 1), distance, time, adjustedTime, biasTerm, (new Date().toString()), temp_1, temp_2, temp_3, airP, hum};
-            DefaultTableModel model = atl.getModel();
-            model.insertRow(listIndex, dataModel);
 
-//            int rowCount = model.getRowCount();
-//            int colCount = model.getColumnCount();
-//            Vector<Vector<Object>> copy = new Vector<>(rowCount);
-//            for (int row = 0; row < rowCount; row++) {
-//                Vector<Object> newRow = new Vector<>(colCount);
-//                copy.add(newRow);
-//                for (int col = 0; col < colCount; col++) {
-//                    newRow.add(model.getValueAt(row, col));
-//                }
-//            }
-//            DefaultTableModel c = new DefaultTableModel(copy, rowCount);
+            Object[] dataModel = new Object[]{"" + (atl.getListIndex()), distance, time, adjustedTime, biasTerm, (new Date().toString()), temp_1, temp_2, temp_3, airP, hum};
+            DefaultTableModel model = atl.getModel();
+            model.insertRow(atl.getListIndex() - 1, dataModel);
+
             scoreboard.setModel(model);
-            model.fireTableDataChanged();
             atl.setModel(model);
             athleteList.replace(atl.getName(), atl);
-            listIndex++;
+            atl.incrementListIndex();
 
         } catch (NullPointerException npe2) {
             JOptionPane.showMessageDialog(this, "Add an athlete first", "Error", JOptionPane.OK_CANCEL_OPTION);
-            listIndex--;
+            atl.decrementListIndex();
         }
 
     }//GEN-LAST:event_submitButtonActionPerformed
@@ -863,6 +877,29 @@ public class UserInterface extends javax.swing.JFrame {
 
     }//GEN-LAST:event_boxAthleteActionPerformed
 
+    private void referenceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_referenceButtonActionPerformed
+        Athlete atl = athleteList.get((String) boxAthlete.getSelectedItem());
+        String[] weatherData = urlReader.getWeatherData();
+        String time = getTimeFromChoice();
+        String temp_1 = weatherData[3];
+        String temp_2 = weatherData[4];
+        String temp_3 = weatherData[5];
+        String airP = weatherData[1];
+        String hum = weatherData[2];
+        atl.setAthletesReferenceTime(time,temp_1,temp_2,temp_3,airP,hum);
+    }//GEN-LAST:event_referenceButtonActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        try{
+        Athlete atl = athleteList.get((String) boxAthlete.getSelectedItem());
+        JDisplayReferenceFrame frame = new JDisplayReferenceFrame(atl);
+        frame.displayFrame();
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Submit a reference time first", "Error", JOptionPane.OK_CANCEL_OPTION);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -905,7 +942,9 @@ public class UserInterface extends javax.swing.JFrame {
         Float weight = Float.parseFloat(athleteData[1]);
         Float circumference = Float.parseFloat(athleteData[2]);
         Float legLength = Float.parseFloat(athleteData[3]);
-        Athlete athlete = new Athlete(fullName, weight, circumference, legLength, initialModel);
+        Athlete athlete = new Athlete(fullName, weight, circumference, legLength, getInitialModel());
+        scoreboard.setModel(athlete.getModel());
+
         athleteList.put(fullName, athlete);
         Object[] objectArr = athleteList.keySet().toArray();
         String[] stringArray = new String[objectArr.length];
@@ -917,6 +956,7 @@ public class UserInterface extends javax.swing.JFrame {
         }
 
         boxAthlete.setModel(new javax.swing.DefaultComboBoxModel(stringArray));
+        boxAthlete.setSelectedItem(athlete.getName());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -932,6 +972,7 @@ public class UserInterface extends javax.swing.JFrame {
     private javax.swing.JLabel humidity;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -951,6 +992,7 @@ public class UserInterface extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel pressure;
     private javax.swing.JLabel previewTimeLabel;
+    private javax.swing.JButton referenceButton;
     private javax.swing.JButton resetButton;
     private javax.swing.JButton roundTimeButton;
     private javax.swing.JTable roundTimeTable;
@@ -1074,5 +1116,40 @@ public class UserInterface extends javax.swing.JFrame {
 
     private float p(String text) throws NumberFormatException {
         return Float.parseFloat(text);
+    }
+
+    private DefaultTableModel getInitialModel() {
+        DefaultTableModel initialMod = new javax.swing.table.DefaultTableModel(
+                new Object[][]{
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null},
+                    {null, null, null, null, null, null, null, null, null, null, null}
+                },
+                new String[]{
+                    "Number", "Distance (m)", "Time(sec:hsec)", "Adjusted Time", "Factor", "Date", "ºC top", "ºC middle", "ºC ice", "Air Pressure", "Relative Humidity"
+                }
+        );
+        return initialMod;
     }
 }
