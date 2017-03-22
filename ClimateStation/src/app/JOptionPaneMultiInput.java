@@ -17,10 +17,6 @@ public class JOptionPaneMultiInput {
         boxArea.add(Box.createVerticalBox()); // a spacer
         boxArea.add(new JLabel("Weight [kg]: "));
         boxArea.add(weight);
-        boxArea.add(new JLabel("Shoulder Circumference [m]: "));
-        boxArea.add(circumference);
-        boxArea.add(new JLabel("Leg Length [m]: "));
-        boxArea.add(legLength);
         
         myPanel.add(boxArea);
 
