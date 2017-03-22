@@ -175,7 +175,7 @@ public class UserInterface extends javax.swing.JFrame {
         temp2.setText("NaN");
 
         temp1_lab3.setFont(new java.awt.Font("Verdana", 0, 16)); // NOI18N
-        temp1_lab3.setText("Temp (Ice)");
+        temp1_lab3.setText("Temp. (Ice)");
 
         temp3.setFont(new java.awt.Font("Verdana", 0, 16)); // NOI18N
         temp3.setText("NaN");
