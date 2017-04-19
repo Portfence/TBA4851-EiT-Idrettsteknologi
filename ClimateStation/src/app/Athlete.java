@@ -41,7 +41,7 @@ public class Athlete {
     }
 
     public float getSurfaceArea() {
-        return weight;
+        return 0.16f;
     }
 
     public void setPreviousTime(String previousTime) {

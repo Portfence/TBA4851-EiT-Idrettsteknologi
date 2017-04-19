@@ -747,11 +747,14 @@ public class UserInterface extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Add an athlete first", "Error", JOptionPane.OK_CANCEL_OPTION);
             return;
         }
-
+        
         String time = getTimeFromChoice();
         String distance = (String) boxDistance.getSelectedItem();
-        String biasTerm = "";
-        String adjustedTime = "";
+        
+        Algorithm a = new Algorithm();
+        Object[] data= a.calculateAdjustedTime(time, p(temp_1), p(temp_2), p(temp_3), p(airP), p(hum), atl.getWeight(), atl.getSurfaceArea());
+        String biasTerm =String.format("%2f",data[1]);
+        String adjustedTime = (String)data[0];
         SimpleDateFormat d=new SimpleDateFormat("EEE, d MMM, ''yy 'at' HH:mm:ss");
         try {
 
