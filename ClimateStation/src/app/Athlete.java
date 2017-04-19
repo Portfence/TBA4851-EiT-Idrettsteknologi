@@ -12,24 +12,15 @@ public class Athlete {
     private final String name;
     private float weight;
     private String previousTime;
-    private float circumference;
-    private float legLength;
-    private float surfaceArea;
     private DefaultTableModel model;
-    private ArrayList<String> list500;
-    private ArrayList<String> list1500;
-    private ArrayList<String> list2000;
     private int listIndex;
     private String athletesReferenceTime;
     private String[] refCond;
 
-    public Athlete(String name, float weight, float circumference, float legLength, DefaultTableModel model) {
+    public Athlete(String name, float weight, DefaultTableModel model) {
         this.name = name;
         this.weight = weight;
-        this.circumference = circumference;
-        this.legLength = legLength;
         this.model = model;
-        calculateSurfaceArea(weight, circumference, legLength);
         listIndex = 1;
     }
 
@@ -42,7 +33,7 @@ public class Athlete {
     }
 
     private void calculateSurfaceArea(float weight, float circumference, float legLength) {
-        surfaceArea = 0.0f;
+        //unimplemented
     }
 
     public String getName() {
@@ -67,22 +58,6 @@ public class Athlete {
 
     public void setWeight(float weight) {
         this.weight = weight;
-    }
-
-    public float getCircumference() {
-        return circumference;
-    }
-
-    public void setCircumference(float circumference) {
-        this.circumference = circumference;
-    }
-
-    public float getLegLength() {
-        return legLength;
-    }
-
-    public void setLegLength(float legLength) {
-        this.legLength = legLength;
     }
 
     public void setModel(DefaultTableModel model) {

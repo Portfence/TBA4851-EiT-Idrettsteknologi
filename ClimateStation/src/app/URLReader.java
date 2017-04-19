@@ -40,6 +40,7 @@ public class URLReader {
         Date today = new Date();
         String from = parseDate(yesterday());
         String url = "http://alfeh.azurewebsites.net/get_temp_data.php" + from;
+        System.out.println(url);
         webData = new URL(url);
     }
 
@@ -121,7 +122,7 @@ public class URLReader {
     private Object[] extractDataFromLine(String lastLine) {
         String temp_1, temp_2, temp_3, pressure, relativeHum;
         ArrayList<Integer> nullNumber = new ArrayList<>();
-        // lastLine = ",{\"time\":\"2017-03-15T10:52:04.363\",\"id\":\"862643032870150\",\"sq\":\"-94 \",\"batt\":\"3.85\",\"baro\":\"98355\",\"rh\":null,\"t1\":\"20.7\",\"t2\":\"31.0\",\"t3\":\"26.6\"}";
+        //lastLine = ",{\"time\":\"2017-03-15T10:52:04.363\",\"id\":\"862643032870150\",\"sq\":\"-94 \",\"batt\":\"3.85\",\"baro\":\"98355\",\"rh\":null,\"t1\":\"20.7\",\"t2\":\"31.0\",\"t3\":\"26.6\"}";
         String[] type = lastLine.split(",");
         String date = type[1].split("\"")[3];
         String data[] = new String[5];

@@ -261,7 +261,7 @@ public class UserInterface extends javax.swing.JFrame {
                     .addComponent(temp1_lab2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(temp2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(temp1_lab3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(temp3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -917,9 +917,7 @@ public class UserInterface extends javax.swing.JFrame {
         String[] athleteData = new JOptionPaneMultiInput().promptInputs();
         String fullName = athleteData[0];
         Float weight = Float.parseFloat(athleteData[1]);
-        Float circumference = Float.parseFloat(athleteData[2]);
-        Float legLength = Float.parseFloat(athleteData[3]);
-        Athlete athlete = new Athlete(fullName, weight, circumference, legLength, getInitialModel());
+        Athlete athlete = new Athlete(fullName, weight, getInitialModel());
         scoreboard.setModel(athlete.getModel());
 
         athleteList.put(fullName, athlete);
@@ -1088,7 +1086,8 @@ public class UserInterface extends javax.swing.JFrame {
             sec = Integer.parseInt((String) boxSec.getSelectedItem());
             hundreds = Integer.parseInt((String) boxMS.getSelectedItem());
         }
-        return "" + sec + ":" + hundreds;
+        return String.format("%02d:%02d",sec,hundreds);
+        //return "" + sec + ":2%d"+hundreds;
     }
 
     private float p(String text) throws NumberFormatException {
