@@ -95,12 +95,11 @@ public class Algorithm {
         double optimalTime = actDistance / optimalSpeed;
 
         double timeIncrease = optimalTime - refRoundTime;
-        String formatTimeIncrease = String.format(Locale.ROOT,"%.2f", timeIncrease);
-        
-        timeIncrease = Double.parseDouble(formatTimeIncrease);
-        System.out.println(timeIncrease);
+        System.out.println("timeIncrease: " + timeIncrease);
         double adjustedTime = roundTimeDecimal - timeIncrease;
-        String normalAdjustedTime = convertToNormalStuff(adjustedTime);
+        System.out.println("adjustedTime: " +adjustedTime);
+        String normalAdjustedTime = convertToNormalStuff(Math.round(adjustedTime * 100.0) / 100.0);
+        System.out.println("normal adj time: "+ normalAdjustedTime);
         return new Object[]{normalAdjustedTime, timeIncrease};
     }
 

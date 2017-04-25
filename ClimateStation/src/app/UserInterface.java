@@ -36,16 +36,16 @@ public class UserInterface extends javax.swing.JFrame {
     private long prevSeconds;
     private long prevHundreds;
     private URLReader urlReader;
-
+    private Algorithm algorithm;
     /**
      * Creates new form UserInterface
      */
     public UserInterface() {
         initComponents();
         fillDropdownBoxes();
-
+        
         athleteList = new HashMap<>();
-
+        algorithm = new Algorithm();
         stopWatch = new StopWatch();
         readyTimer();
 
@@ -58,9 +58,13 @@ public class UserInterface extends javax.swing.JFrame {
         try {
             urlReader = new URLReader();
             boolean success = urlReader.parseURL();
+            System.out.println("Attempting to parse URL...");
             if (!success) {
                 urlReader = new URLReader(true);
                 urlReader.parseURL();
+            }
+            else{
+                System.out.println("Success!");
             }
         } catch (MalformedURLException ex) {
             System.out.println("Malformed URL Exception");
@@ -75,15 +79,15 @@ public class UserInterface extends javax.swing.JFrame {
         String[] weatherData = urlReader.getWeatherData();
         if (weatherData != null) {
             //Convert Pa to hPa
-            
+
             float atmPressure = convertTohPa(weatherData[1]);
-                    
+
             dateLabel.setText(weatherData[0]);
             temp1.setText(weatherData[4] + " [ºC]");
             temp2.setText(weatherData[3] + " [ºC]");
             temp3.setText(weatherData[5] + " [ºC]");
             pressure.setText(atmPressure + " [hPa]");
-            humidity.setText(weatherData[2] + " [%]");
+            humidity.setText(Float.parseFloat(weatherData[2])*100 + " [%]");
         }
     }
 
@@ -153,6 +157,8 @@ public class UserInterface extends javax.swing.JFrame {
         checkBox_corrector = new javax.swing.JCheckBox();
         jButton2 = new javax.swing.JButton();
         previewTimeLabel = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        corrLabel = new javax.swing.JLabel();
         jCheckBox1 = new javax.swing.JCheckBox();
         referenceButton = new javax.swing.JButton();
         displayReferenceButton = new javax.swing.JButton();
@@ -160,6 +166,7 @@ public class UserInterface extends javax.swing.JFrame {
         scoreboard = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Experts In Teamwork 2017");
         setBackground(new java.awt.Color(204, 204, 204));
         setMaximumSize(new java.awt.Dimension(1920, 1080));
         setMinimumSize(new java.awt.Dimension(1024, 600));
@@ -433,6 +440,7 @@ public class UserInterface extends javax.swing.JFrame {
         });
 
         checkBox_corrector.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+        checkBox_corrector.setSelected(true);
         checkBox_corrector.setText("Real-Time Data");
         checkBox_corrector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -452,6 +460,12 @@ public class UserInterface extends javax.swing.JFrame {
         previewTimeLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         previewTimeLabel.setText("00:00");
 
+        jLabel7.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel7.setText("Time Subtracted");
+
+        corrLabel.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        corrLabel.setText("00:00");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -464,7 +478,12 @@ public class UserInterface extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(previewTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(previewTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(corrLabel)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -518,7 +537,9 @@ public class UserInterface extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(previewTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(previewTimeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7)
+                    .addComponent(corrLabel))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -592,14 +613,17 @@ public class UserInterface extends javax.swing.JFrame {
                     .addComponent(startTimerButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(addAthleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                     .addComponent(jButton1))
-                .addGap(29, 29, 29)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(23, 23, 23))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(startTimerButton, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(data_label1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -634,15 +658,12 @@ public class UserInterface extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(addAthleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addComponent(startTimerButton, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(addAthleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28))
+                .addGap(21, 21, 21))
         );
 
         scoreboard.setFont(new java.awt.Font("Verdana", 0, 14)); // NOI18N
@@ -703,6 +724,7 @@ public class UserInterface extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void startTimerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startTimerButtonActionPerformed
@@ -757,15 +779,8 @@ public class UserInterface extends javax.swing.JFrame {
         String time = getTimeFromChoice();
         String distance = (String) boxDistance.getSelectedItem();
 
-        Algorithm a = new Algorithm();
-//        System.out.println(time);
-//        System.out.println(p(temp_3));
-//        System.out.println(p(hum));
-//        System.out.println((airP));
-//        System.out.println(p(temp_1));
-//        System.out.println(athlete.getWeight());
-//        System.out.println(athlete.getSurfaceArea());
-        Object[] data = a.calculateAdjustedTime(time, p(temp_3), 0, p(hum),  p(airP),p(temp_1), athlete.getWeight(), athlete.getSurfaceArea());
+        
+        Object[] data = algorithm.calculateAdjustedTime(time, p(temp_3), 0, p(hum), p(airP), p(temp_1), athlete.getWeight(), athlete.getSurfaceArea());
         String biasTerm = String.format("%.2f", data[1]);
         String adjustedTime = (String) data[0];
         SimpleDateFormat d = new SimpleDateFormat("EEE, d MMM, ''yy 'at' HH:mm:ss");
@@ -835,23 +850,30 @@ public class UserInterface extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String time = getTimeFromChoice();
-        float[] weatherData = new float[5];
+        Athlete athlete = athleteList.get((String) boxAthlete.getSelectedItem());
+        String[] weatherData = urlReader.getWeatherData();
+        String temp_1 = weatherData[3];
+        String temp_2 = weatherData[4];
+        String temp_3 = weatherData[5];
+        String airP = weatherData[1];
+        String hum = weatherData[2];
+        Object[] data = new Object[2];
         if (checkBox_corrector.isSelected()) {
-
-            //code for real time data use here
-            //weatherData=
-            //time = runAdvancedAndAwesomeAlgorithm(time, weatherData);
+            data = algorithm.calculateAdjustedTime(time, p(temp_3), 0, p(hum), p(airP), p(temp_1), athlete.getWeight(), athlete.getSurfaceArea());
         } else {
             //code for manually submitted data
             try {
-                weatherData = new float[]{p(textTop.getText()), p(textMiddle.getText()), p(textIce.getText()), p(textPressure.getText()), p(textHumidity.getText())};
+                
+                data = algorithm.calculateAdjustedTime(time, p(textIce.getText()), 0, p(textHumidity.getText()), 100*p(textPressure.getText()),p(textMiddle.getText()), athlete.getWeight(), athlete.getSurfaceArea());
             } catch (NumberFormatException nfe) {
                 JOptionPane.showMessageDialog(this, "Enter real numbers only", "Error", JOptionPane.OK_CANCEL_OPTION);
             }
-            //weatherData=
-            //time = runAdvancedAndAwesomeAlgorithm(time, weatherData);
         }
-        //previewTimeLabel.setText(time);
+
+        String corr = String.format("%.2f", data[1]);
+        String corrTime = (String)data[0];
+        previewTimeLabel.setText(corrTime);
+        corrLabel.setText(corr);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
@@ -957,6 +979,7 @@ public class UserInterface extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> boxMS;
     private javax.swing.JComboBox<String> boxSec;
     private javax.swing.JCheckBox checkBox_corrector;
+    private javax.swing.JLabel corrLabel;
     private javax.swing.JLabel data_label;
     private javax.swing.JLabel data_label1;
     private javax.swing.JLabel dateLabel;
@@ -974,6 +997,7 @@ public class UserInterface extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
@@ -1039,13 +1063,11 @@ public class UserInterface extends javax.swing.JFrame {
                 } catch (IOException ex) {
                     System.out.println("Error in weather Timer.. IO Exception");
                 }
-                System.out.println("getAndDisplayWeatherData()");
                 getAndDisplayWeatherData();
             }
         });
         weatherUpdater.start();
     }
-    
 
     /**
      *
@@ -1138,6 +1160,6 @@ public class UserInterface extends javax.swing.JFrame {
     }
 
     private float convertTohPa(String string) {
-        return Float.parseFloat(string)/100.f;
+        return Float.parseFloat(string) / 100.f;
     }
 }
