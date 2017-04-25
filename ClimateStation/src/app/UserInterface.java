@@ -73,12 +73,18 @@ public class UserInterface extends javax.swing.JFrame {
 
     private void getAndDisplayWeatherData() {
         String[] weatherData = urlReader.getWeatherData();
-        dateLabel.setText(weatherData[0]);
-        temp1.setText(weatherData[3] + " [ºC]");
-        temp2.setText(weatherData[4] + " [ºC]");
-        temp3.setText(weatherData[5] + " [ºC]");
-        pressure.setText(weatherData[1] + " [Pa]");
-        humidity.setText(weatherData[2] + " [%]");
+        if (weatherData != null) {
+            //Convert Pa to hPa
+            
+            float atmPressure = convertTohPa(weatherData[1]);
+                    
+            dateLabel.setText(weatherData[0]);
+            temp1.setText(weatherData[4] + " [ºC]");
+            temp2.setText(weatherData[3] + " [ºC]");
+            temp3.setText(weatherData[5] + " [ºC]");
+            pressure.setText(atmPressure + " [hPa]");
+            humidity.setText(weatherData[2] + " [%]");
+        }
     }
 
     private void fillDropdownBoxes() {
@@ -415,7 +421,7 @@ public class UserInterface extends javax.swing.JFrame {
         jLabel10.setText("ºC (MIDDLE)");
 
         jLabel11.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel11.setText("Pressure [Pa]");
+        jLabel11.setText("Pressure [hPa]");
 
         jLabel12.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel12.setText("Humidity [Norm]");
@@ -661,7 +667,7 @@ public class UserInterface extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "#", "Distance", "Time", "Adjusted Time", "Factor", "Date", "ºC top", "ºC middle", "ºC ice", "Air Pressure", "R.H"
+                "#", "Distance", "Time", "Adj Time", "Corr.", "Date", "ºC top", "ºC middle", "ºC ice", "Atm. Press [hPa]", "R.H"
             }
         ));
         scoreboard.setRowHeight(20);
@@ -733,7 +739,7 @@ public class UserInterface extends javax.swing.JFrame {
 
     private void submitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitButtonActionPerformed
 
-        Athlete atl;
+        Athlete athlete;
         String[] weatherData = urlReader.getWeatherData();
         String temp_1 = weatherData[3];
         String temp_2 = weatherData[4];
@@ -742,35 +748,42 @@ public class UserInterface extends javax.swing.JFrame {
         String hum = weatherData[2];
 
         try {
-            atl = athleteList.get((String) boxAthlete.getSelectedItem());
+            athlete = athleteList.get((String) boxAthlete.getSelectedItem());
         } catch (NullPointerException npe) {
             JOptionPane.showMessageDialog(this, "Add an athlete first", "Error", JOptionPane.OK_CANCEL_OPTION);
             return;
         }
-        
+
         String time = getTimeFromChoice();
         String distance = (String) boxDistance.getSelectedItem();
-        
+
         Algorithm a = new Algorithm();
-        Object[] data= a.calculateAdjustedTime(time, p(temp_1), p(temp_2), p(temp_3), p(airP), p(hum), atl.getWeight(), atl.getSurfaceArea());
-        String biasTerm =String.format("%2f",data[1]);
-        String adjustedTime = (String)data[0];
-        SimpleDateFormat d=new SimpleDateFormat("EEE, d MMM, ''yy 'at' HH:mm:ss");
+//        System.out.println(time);
+//        System.out.println(p(temp_3));
+//        System.out.println(p(hum));
+//        System.out.println((airP));
+//        System.out.println(p(temp_1));
+//        System.out.println(athlete.getWeight());
+//        System.out.println(athlete.getSurfaceArea());
+        Object[] data = a.calculateAdjustedTime(time, p(temp_3), 0, p(hum),  p(airP),p(temp_1), athlete.getWeight(), athlete.getSurfaceArea());
+        String biasTerm = String.format("%.2f", data[1]);
+        String adjustedTime = (String) data[0];
+        SimpleDateFormat d = new SimpleDateFormat("EEE, d MMM, ''yy 'at' HH:mm:ss");
         try {
 
-            Object[] dataModel = new Object[]{"" + (atl.getListIndex()), distance, time, adjustedTime, biasTerm, (d.format(new Date())), temp_1, temp_2, temp_3, airP, hum};
-            DefaultTableModel model = atl.getModel();
-            model.insertRow(atl.getListIndex() - 1, dataModel);
+            Object[] dataModel = new Object[]{"" + (athlete.getListIndex()), distance, time, adjustedTime, biasTerm, (d.format(new Date())), temp_2, temp_1, temp_3, convertTohPa(airP), hum};
+            DefaultTableModel model = athlete.getModel();
+            model.insertRow(athlete.getListIndex() - 1, dataModel);
 
             scoreboard.setModel(model);
             resizeColumnWidth(scoreboard);
-            atl.setModel(model);
-            athleteList.replace(atl.getName(), atl);
-            atl.incrementListIndex();
+            athlete.setModel(model);
+            athleteList.replace(athlete.getName(), athlete);
+            athlete.incrementListIndex();
 
         } catch (NullPointerException npe2) {
             JOptionPane.showMessageDialog(this, "Add an athlete first", "Error", JOptionPane.OK_CANCEL_OPTION);
-            atl.decrementListIndex();
+            athlete.decrementListIndex();
         }
 
     }//GEN-LAST:event_submitButtonActionPerformed
@@ -827,7 +840,7 @@ public class UserInterface extends javax.swing.JFrame {
 
             //code for real time data use here
             //weatherData=
-            time = runAdvancedAndAwesomeAlgorithm(time, weatherData);
+            //time = runAdvancedAndAwesomeAlgorithm(time, weatherData);
         } else {
             //code for manually submitted data
             try {
@@ -836,9 +849,9 @@ public class UserInterface extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Enter real numbers only", "Error", JOptionPane.OK_CANCEL_OPTION);
             }
             //weatherData=
-            time = runAdvancedAndAwesomeAlgorithm(time, weatherData);
+            //time = runAdvancedAndAwesomeAlgorithm(time, weatherData);
         }
-        previewTimeLabel.setText(time);
+        //previewTimeLabel.setText(time);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
@@ -872,7 +885,7 @@ public class UserInterface extends javax.swing.JFrame {
             frame.displayFrame();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Submit a reference first!", "Error", JOptionPane.OK_OPTION);
-            
+
         }
     }//GEN-LAST:event_displayReferenceButtonActionPerformed
 
@@ -1021,35 +1034,18 @@ public class UserInterface extends javax.swing.JFrame {
         Timer weatherUpdater = new Timer(60000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 try {
                     urlReader.parseURL();
                 } catch (IOException ex) {
                     System.out.println("Error in weather Timer.. IO Exception");
                 }
+                System.out.println("getAndDisplayWeatherData()");
                 getAndDisplayWeatherData();
             }
         });
         weatherUpdater.start();
     }
-
-    /**
-     * This is where the algorithm for correcting speed skating times is
-     * implemented It's creators are Group 4 of EiT 2017. Idrettsteknologi.
-     *
-     * @param measuredTime
-     * @param weatherData
-     * @return
-     */
-    public String runAdvancedAndAwesomeAlgorithm(String measuredTime, float[] weatherData) {
-        for (int i = 0; i < weatherData.length; i++) {
-            System.out.println(weatherData[i]);
-        }
-        int localSec = 1;
-        int localHundreds = 1;
-        String newTime = String.format("%02d:%02d", localSec, localHundreds);
-        return newTime;
-    }
+    
 
     /**
      *
@@ -1089,7 +1085,7 @@ public class UserInterface extends javax.swing.JFrame {
             sec = Integer.parseInt((String) boxSec.getSelectedItem());
             hundreds = Integer.parseInt((String) boxMS.getSelectedItem());
         }
-        return String.format("%02d:%02d",sec,hundreds);
+        return String.format("%02d:%02d", sec, hundreds);
         //return "" + sec + ":2%d"+hundreds;
     }
 
@@ -1119,24 +1115,29 @@ public class UserInterface extends javax.swing.JFrame {
                     {null, null, null, null, null, null, null, null, null, null, null}
                 },
                 new String[]{
-                    "#", "Distance", "Time", "Adjusted Time", "Factor", "Date", "ºC top", "ºC middle", "ºC ice", "Air Pressure", "R.H"
+                    "#", "Distance", "Time", "Corr. Time", "Corr.", "Date", "ºC top", "ºC middle", "ºC ice", "Atm.Press[hPa]", "R.H"
                 }
         );
         return initialMod;
     }
-    
+
     private void resizeColumnWidth(JTable table) {
-    final TableColumnModel columnModel = table.getColumnModel();
-    for (int column = 0; column < table.getColumnCount(); column++) {
-        int width = 15; // Min width
-        for (int row = 0; row < table.getRowCount(); row++) {
-            TableCellRenderer renderer = table.getCellRenderer(row, column);
-            Component comp = table.prepareRenderer(renderer, row, column);
-            width = Math.max(comp.getPreferredSize().width +1 , width);
+        final TableColumnModel columnModel = table.getColumnModel();
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            int width = 20; // Min width
+            for (int row = 0; row < table.getRowCount(); row++) {
+                TableCellRenderer renderer = table.getCellRenderer(row, column);
+                Component comp = table.prepareRenderer(renderer, row, column);
+                width = Math.max(comp.getPreferredSize().width + 1, width);
+            }
+            if (width > 300) {
+                width = 300;
+            }
+            columnModel.getColumn(column).setPreferredWidth(width);
         }
-        if(width > 300)
-            width=300;
-        columnModel.getColumn(column).setPreferredWidth(width);
     }
-}
+
+    private float convertTohPa(String string) {
+        return Float.parseFloat(string)/100.f;
+    }
 }

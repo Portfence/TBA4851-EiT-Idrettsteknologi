@@ -785,7 +785,7 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Verdana" size="12" style="0"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Pressure [Pa]"/>
+                <Property name="text" type="java.lang.String" value="Pressure [hPa]"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel12">
@@ -889,13 +889,13 @@
                 <Column editable="true" title="#" type="java.lang.Object"/>
                 <Column editable="true" title="Distance" type="java.lang.Object"/>
                 <Column editable="true" title="Time" type="java.lang.Object"/>
-                <Column editable="true" title="Adjusted Time" type="java.lang.Object"/>
-                <Column editable="true" title="Factor" type="java.lang.Object"/>
+                <Column editable="true" title="Adj Time" type="java.lang.Object"/>
+                <Column editable="true" title="Corr." type="java.lang.Object"/>
                 <Column editable="true" title="Date" type="java.lang.Object"/>
                 <Column editable="true" title="&#xba;C top" type="java.lang.Object"/>
                 <Column editable="true" title="&#xba;C middle" type="java.lang.Object"/>
                 <Column editable="true" title="&#xba;C ice" type="java.lang.Object"/>
-                <Column editable="true" title="Air Pressure" type="java.lang.Object"/>
+                <Column editable="true" title="Atm. Press [hPa]" type="java.lang.Object"/>
                 <Column editable="true" title="R.H" type="java.lang.Object"/>
               </Table>
             </Property>

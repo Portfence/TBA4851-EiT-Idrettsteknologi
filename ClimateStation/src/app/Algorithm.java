@@ -1,5 +1,13 @@
 package app;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.ejml.data.Complex64F;
 
 /**
@@ -16,11 +24,11 @@ public class Algorithm {
 
     // REFERENCE CONSTANTS
     private final double refRoundTime = 30.0; // Gravity Constant
-    private final double refIceTemp = -5;// Molecular mass for calculating air resistance
+    private final double refIceTemp = -10;// Molecular mass for calculating air resistance
     private final double refWind = 0;
-    private final double refRelHumid = 0.5;
+    private final double refRelHumid = 0.4;
     private final double refAirPressure = 1e5;
-    private final double refAirTemp = 5.0;
+    private final double refAirTemp = 10.0;
 
     //PARAMTERS
     private double calculateReferenceConditions(double athlWeight, double athlArea) {
@@ -87,6 +95,10 @@ public class Algorithm {
         double optimalTime = actDistance / optimalSpeed;
 
         double timeIncrease = optimalTime - refRoundTime;
+        String formatTimeIncrease = String.format(Locale.ROOT,"%.2f", timeIncrease);
+        
+        timeIncrease = Double.parseDouble(formatTimeIncrease);
+        System.out.println(timeIncrease);
         double adjustedTime = roundTimeDecimal - timeIncrease;
         String normalAdjustedTime = convertToNormalStuff(adjustedTime);
         return new Object[]{normalAdjustedTime, timeIncrease};
@@ -100,7 +112,7 @@ public class Algorithm {
      * @return
      */
     public double getIceFriction(double speed, double iceTemperature) {
-        double[] iceFrictionArray = new double[]{0.000175 * speed + 0.0034, 0.00015 * speed + 0.0035, (1 / 7500) * speed + 0.0036};
+        double[] iceFrictionArray = new double[]{0.000175 * speed + 0.0034, 0.00015 * speed + 0.0035, (1. / 7500.) * speed + 0.0036};
         double iceFriction;
 
         if (iceTemperature > -5 && iceTemperature <= -1) {
@@ -117,26 +129,17 @@ public class Algorithm {
 
     private double convertToDecimal(String roundTime) {
         String[] tokens = roundTime.split(":");
-        int first = Integer.parseInt(tokens[0]);
-        int second = Integer.parseInt(tokens[1]);
-        String timeString = "" + first + "." + (second * 100/60);
-        return Double.parseDouble(timeString);
+        int part2 = Integer.parseInt(tokens[1]);
+        String decimalString = tokens[0] + "." + ((int)(part2));
+        double decimalSeconds=Float.parseFloat(decimalString);
+        return decimalSeconds;
     }
 
     private String convertToNormalStuff(double adjustedTime) {
-
-        String formatted = String.format("%02f", adjustedTime);
-        System.out.println(formatted);
-        String[] tokens = formatted.split("\\,");
-        System.out.println(tokens[0]);
-        System.out.println(tokens[1]);
-        String first = tokens[0];
-        String second=tokens[1];
-//        String first = String.format("%2d", Integer.parseInt(tokens[0]));
-//        System.out.println(first);
-//        String second = String.format("%2d", Integer.parseInt(tokens[1]));
-//        System.out.println(second);
-        return first+ ":"+second;
+        String decimalString = ""+adjustedTime;
+        String[] tokens = decimalString.split("\\.");
+        String time= tokens[0] + ":" + tokens[1];
+        return time;
     }
 
 }

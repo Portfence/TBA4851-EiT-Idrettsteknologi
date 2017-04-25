@@ -26,7 +26,8 @@ public class URLReader {
     public URLReader() throws MalformedURLException {
         Date today = new Date();
         String from = parseDate(today);
-        String url = "http://alfeh.azurewebsites.net/get_temp_data.php" + from;
+        //String url = "http://alfeh.azurewebsites.net/get_temp_data.php" + from;
+        String url = "http://alfeh.azurewebsites.net/get_temp_data.php?from=2017-04-21";
         webData = new URL(url);
     }
 
@@ -69,6 +70,7 @@ public class URLReader {
         } catch (ArrayIndexOutOfBoundsException e) {
             return false;
         }
+        //lastLine = ",{\"time\":\"2017-03-15T10:52:04.363\",\"id\":\"862643032870150\",\"sq\":\"-94 \",\"batt\":\"3.85\",\"baro\":\"98355\",\"rh\":0.5,\"t1\":\"5\",\"t2\":\"5\",\"t3\":\"-10\"}";
         Object[] objectData = extractDataFromLine(lastLine);
         weatherData = (String[]) objectData[0];
         ArrayList<Integer> nullNumbers = (ArrayList) objectData[1];
@@ -122,7 +124,6 @@ public class URLReader {
     private Object[] extractDataFromLine(String lastLine) {
         String temp_1, temp_2, temp_3, pressure, relativeHum;
         ArrayList<Integer> nullNumber = new ArrayList<>();
-        //lastLine = ",{\"time\":\"2017-03-15T10:52:04.363\",\"id\":\"862643032870150\",\"sq\":\"-94 \",\"batt\":\"3.85\",\"baro\":\"98355\",\"rh\":null,\"t1\":\"20.7\",\"t2\":\"31.0\",\"t3\":\"26.6\"}";
         String[] type = lastLine.split(",");
         String date = type[1].split("\"")[3];
         String data[] = new String[5];
@@ -136,11 +137,16 @@ public class URLReader {
 
             }
         }
-        pressure = data[0];
-        relativeHum = data[1];
-        temp_1 = data[2];
+//        pressure = data[0];
+//        relativeHum = data[1];
+//        temp_1 = data[2];
+//        temp_2 = data[3];
+//        temp_3 = data[4];
+        pressure = "100000";
+        relativeHum = "0.4";
+        temp_1 = "10";
         temp_2 = data[3];
-        temp_3 = data[4];
+        temp_3 = "-5";
 
         return new Object[]{new String[]{date, pressure, relativeHum, temp_1, temp_2, temp_3}, nullNumber};
     }
