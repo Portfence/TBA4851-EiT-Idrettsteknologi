@@ -1,13 +1,5 @@
 package app;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.ejml.data.Complex64F;
 
 /**
@@ -137,7 +129,9 @@ public class Algorithm {
     private String convertToNormalStuff(double adjustedTime) {
         String decimalString = ""+adjustedTime;
         String[] tokens = decimalString.split("\\.");
-        String time= tokens[0] + ":" + tokens[1];
+        int first = Integer.parseInt(tokens[0]);
+        int second = Integer.parseInt(tokens[1]);
+        String time = String.format("%2d:%2d",first,second);
         return time;
     }
 

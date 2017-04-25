@@ -26,8 +26,8 @@ public class URLReader {
     public URLReader() throws MalformedURLException {
         Date today = new Date();
         String from = parseDate(today);
-        //String url = "http://alfeh.azurewebsites.net/get_temp_data.php" + from;
-        String url = "http://alfeh.azurewebsites.net/get_temp_data.php?from=2017-04-21";
+        String url = "http://alfeh.azurewebsites.net/get_temp_data.php" + from;
+        //String url = "http://alfeh.azurewebsites.net/get_temp_data.php?from=2017-04-21";
         webData = new URL(url);
     }
 
@@ -74,9 +74,6 @@ public class URLReader {
         Object[] objectData = extractDataFromLine(lastLine);
         weatherData = (String[]) objectData[0];
         ArrayList<Integer> nullNumbers = (ArrayList) objectData[1];
-        if (!nullNumbers.isEmpty()) {
-            usePreviousData(nullNumbers);
-        }
         //prints actual runtime
         System.out.println("Runtime: " + (System.currentTimeMillis() - then));
         in.close();
@@ -137,30 +134,18 @@ public class URLReader {
 
             }
         }
-//        pressure = data[0];
-//        relativeHum = data[1];
-//        temp_1 = data[2];
-//        temp_2 = data[3];
-//        temp_3 = data[4];
-        pressure = "100000";
-        relativeHum = "0.4";
-        temp_1 = "10";
+        pressure = data[0];
+        relativeHum = data[1];
+        temp_1 = data[2];
         temp_2 = data[3];
-        temp_3 = "-5";
+        temp_3 = data[4];
+//        pressure = "100000";
+//        relativeHum = "0.4";
+//        temp_1 = "10";
+//        temp_2 = data[3];
+//        temp_3 = "-5";
 
         return new Object[]{new String[]{date, pressure, relativeHum, temp_1, temp_2, temp_3}, nullNumber};
     }
 
-    /**
-     * Unimplemented - if a sensor shows "null" then this function should return
-     * the previous data for the sensors in question. returns void or something
-     * else
-     *
-     * @param nullNumber
-     */
-    private void usePreviousData(ArrayList<Integer> nullNumber) {
-//        for (int i = 0; i < nullNumber.toArray().length; i++) {
-//            //currentLine
-//        }
-    }
 }
