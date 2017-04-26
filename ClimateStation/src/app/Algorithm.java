@@ -15,15 +15,14 @@ public class Algorithm {
     private final double R = 8.31447;
 
     // REFERENCE CONSTANTS
-    private final double refRoundTime = 30.0; // Gravity Constant
-    private final double refIceTemp = -10;// Molecular mass for calculating air resistance
+    private final double refIceTemp = -5;// Molecular mass for calculating air resistance
     private final double refWind = 0;
-    private final double refRelHumid = 0.4;
-    private final double refAirPressure = 1e5;
-    private final double refAirTemp = 10.0;
+    private final double refRelHumid = 0.5;
+    private final double refAirPressure = 101325;
+    private final double refAirTemp = 5.0;
 
     //PARAMTERS
-    private double calculateReferenceConditions(double athlWeight, double athlArea) {
+    private double calculateReferenceConditions(double athlWeight, double athlArea, double refRoundTime) {
         // distance after steady state [m]
         double distance = 400;
 
@@ -65,7 +64,7 @@ public class Algorithm {
      * @param athlArea
      * @return
      */
-    public Object[] calculateAdjustedTime(String roundTime, double iceTemperature, double wind, double relHumidity, double airPressure, double airTemp, double athlWeight, double athlArea) {
+    public Object[] calculateAdjustedTime(String roundTime, double iceTemperature, double wind, double relHumidity, double airPressure, double airTemp, double athlWeight, double athlArea, String refRoundTime) {
         double roundTimeDecimal = convertToDecimal(roundTime);
         double actDistance = 400;
         double actSpeed = actDistance / roundTimeDecimal;
@@ -76,7 +75,7 @@ public class Algorithm {
         double actAirDensity = (actPd * Md + actPv * Mv) / actRT;
         double cfAir = 0.5 * actAirDensity * athlArea;
         double cfIce = athlWeight * gravityConstant * actIceFriction;
-        double totalRefPower = calculateReferenceConditions(athlWeight, athlArea);
+        double totalRefPower = calculateReferenceConditions(athlWeight, athlArea, convertToDecimal(refRoundTime));
         // compared to roots in matlab the order of the array has to be inversed
         // in the findRoots(rootsArr) function
         double[] rootsArr = new double[]{-totalRefPower, 0.0035 * athlWeight * gravityConstant, 0.00015 * athlWeight * gravityConstant, cfAir};
@@ -86,12 +85,12 @@ public class Algorithm {
         double optimalSpeed = foundRoots[2].real;
         double optimalTime = actDistance / optimalSpeed;
 
-        double timeIncrease = optimalTime - refRoundTime;
+        double timeIncrease = optimalTime - convertToDecimal(refRoundTime);
         System.out.println("timeIncrease: " + timeIncrease);
         double adjustedTime = roundTimeDecimal - timeIncrease;
-        System.out.println("adjustedTime: " +adjustedTime);
+        System.out.println("adjustedTime: " + adjustedTime);
         String normalAdjustedTime = convertToNormalStuff(Math.round(adjustedTime * 100.0) / 100.0);
-        System.out.println("normal adj time: "+ normalAdjustedTime);
+        System.out.println("normal adj time: " + normalAdjustedTime);
         return new Object[]{normalAdjustedTime, timeIncrease};
     }
 
@@ -120,19 +119,25 @@ public class Algorithm {
 
     private double convertToDecimal(String roundTime) {
         String[] tokens = roundTime.split(":");
+        int part1 = Integer.parseInt(tokens[0]);
         int part2 = Integer.parseInt(tokens[1]);
-        String decimalString = tokens[0] + "." + ((int)(part2));
-        double decimalSeconds=Float.parseFloat(decimalString);
+        //String decimalString = tokens[0] + "." + ((int) (part2));
+        String decimalString = String.format("%02d.%02d",part1,part2);
+        double decimalSeconds = Float.parseFloat(decimalString);
+        System.out.println(decimalSeconds);
         return decimalSeconds;
     }
 
     private String convertToNormalStuff(double adjustedTime) {
-        String decimalString = ""+adjustedTime;
-        String[] tokens = decimalString.split("\\.");
+        String decimalString = String.format("%.02f",adjustedTime);
+        System.out.println("decimalString: " + decimalString);
+        String[] tokens = decimalString.split("\\,");
         int first = Integer.parseInt(tokens[0]);
         int second = Integer.parseInt(tokens[1]);
-        String time = String.format("%2d:%2d",first,second);
+        System.out.println("token1: " + tokens[1]);
+        String time = String.format("%02d:%02d", first, second);
         return time;
     }
+
 
 }

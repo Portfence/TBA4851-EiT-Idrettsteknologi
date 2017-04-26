@@ -915,7 +915,7 @@
                 <Column editable="true" title="Distance" type="java.lang.Object"/>
                 <Column editable="true" title="Time" type="java.lang.Object"/>
                 <Column editable="true" title="Adj Time" type="java.lang.Object"/>
-                <Column editable="true" title="Corr." type="java.lang.Object"/>
+                <Column editable="true" title="Subtract" type="java.lang.Object"/>
                 <Column editable="true" title="Date" type="java.lang.Object"/>
                 <Column editable="true" title="&#xba;C top" type="java.lang.Object"/>
                 <Column editable="true" title="&#xba;C middle" type="java.lang.Object"/>

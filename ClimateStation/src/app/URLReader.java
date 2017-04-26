@@ -27,7 +27,7 @@ public class URLReader {
         Date today = new Date();
         String from = parseDate(today);
         String url = "http://alfeh.azurewebsites.net/get_temp_data.php" + from;
-        //String url = "http://alfeh.azurewebsites.net/get_temp_data.php?from=2017-04-21";
+        //String url = "http://alfeh.azurewebsites.net/get_temp_data.php?from=2017-04-25";
         webData = new URL(url);
     }
 

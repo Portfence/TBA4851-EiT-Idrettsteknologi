@@ -5,10 +5,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.Timer;
@@ -37,13 +42,14 @@ public class UserInterface extends javax.swing.JFrame {
     private long prevHundreds;
     private URLReader urlReader;
     private Algorithm algorithm;
+
     /**
      * Creates new form UserInterface
      */
     public UserInterface() {
         initComponents();
         fillDropdownBoxes();
-        
+
         athleteList = new HashMap<>();
         algorithm = new Algorithm();
         stopWatch = new StopWatch();
@@ -62,8 +68,7 @@ public class UserInterface extends javax.swing.JFrame {
             if (!success) {
                 urlReader = new URLReader(true);
                 urlReader.parseURL();
-            }
-            else{
+            } else {
                 System.out.println("Success!");
             }
         } catch (MalformedURLException ex) {
@@ -81,13 +86,14 @@ public class UserInterface extends javax.swing.JFrame {
             //Convert Pa to hPa
 
             float atmPressure = convertTohPa(weatherData[1]);
-
             dateLabel.setText(weatherData[0]);
             temp1.setText(weatherData[4] + " [ºC]");
             temp2.setText(weatherData[3] + " [ºC]");
             temp3.setText(weatherData[5] + " [ºC]");
             pressure.setText(atmPressure + " [hPa]");
-            humidity.setText(Float.parseFloat(weatherData[2])*100 + " [%]");
+            if (weatherData[2] != null) {
+                humidity.setText(Float.parseFloat(weatherData[2]) + " [%]");
+            }
         }
     }
 
@@ -688,7 +694,7 @@ public class UserInterface extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "#", "Distance", "Time", "Adj Time", "Corr.", "Date", "ºC top", "ºC middle", "ºC ice", "Atm. Press [hPa]", "R.H"
+                "#", "Distance", "Time", "Adj Time", "Subtract", "Date", "ºC top", "ºC middle", "ºC ice", "Atm. Press [hPa]", "R.H"
             }
         ));
         scoreboard.setRowHeight(20);
@@ -779,13 +785,11 @@ public class UserInterface extends javax.swing.JFrame {
         String time = getTimeFromChoice();
         String distance = (String) boxDistance.getSelectedItem();
 
-        
-        Object[] data = algorithm.calculateAdjustedTime(time, p(temp_3), 0, p(hum), p(airP), p(temp_1), athlete.getWeight(), athlete.getSurfaceArea());
-        String biasTerm = String.format("%.2f", data[1]);
-        String adjustedTime = (String) data[0];
-        SimpleDateFormat d = new SimpleDateFormat("EEE, d MMM, ''yy 'at' HH:mm:ss");
         try {
-
+            Object[] data = algorithm.calculateAdjustedTime(time, p(temp_3), 0, p(hum), p(airP), p(temp_2), athlete.getWeight(), athlete.getSurfaceArea(), athlete.getReferenceTime());
+            String biasTerm = String.format("%.2f", data[1]);
+            String adjustedTime = (String) data[0];
+            SimpleDateFormat d = new SimpleDateFormat("EEE, d MMM, ''yy 'at' HH:mm:ss");
             Object[] dataModel = new Object[]{"" + (athlete.getListIndex()), distance, time, adjustedTime, biasTerm, (d.format(new Date())), temp_2, temp_1, temp_3, convertTohPa(airP), hum};
             DefaultTableModel model = athlete.getModel();
             model.insertRow(athlete.getListIndex() - 1, dataModel);
@@ -859,19 +863,19 @@ public class UserInterface extends javax.swing.JFrame {
         String hum = weatherData[2];
         Object[] data = new Object[2];
         if (checkBox_corrector.isSelected()) {
-            data = algorithm.calculateAdjustedTime(time, p(temp_3), 0, p(hum), p(airP), p(temp_1), athlete.getWeight(), athlete.getSurfaceArea());
+            data = algorithm.calculateAdjustedTime(time, p(temp_3), 0, p(hum), p(airP), p(temp_2), athlete.getWeight(), athlete.getSurfaceArea(), athlete.getReferenceTime());
         } else {
             //code for manually submitted data
             try {
-                
-                data = algorithm.calculateAdjustedTime(time, p(textIce.getText()), 0, p(textHumidity.getText()), 100*p(textPressure.getText()),p(textMiddle.getText()), athlete.getWeight(), athlete.getSurfaceArea());
+
+                data = algorithm.calculateAdjustedTime(time, p(textIce.getText()), 0, p(textHumidity.getText()), 100 * p(textPressure.getText()), p(textTop.getText()), athlete.getWeight(), athlete.getSurfaceArea(), athlete.getReferenceTime());
             } catch (NumberFormatException nfe) {
-                JOptionPane.showMessageDialog(this, "Enter real numbers only", "Error", JOptionPane.OK_CANCEL_OPTION);
+                JOptionPane.showMessageDialog(this, "Enter real numbers only", "Error", JOptionPane.NO_OPTION);
             }
         }
 
         String corr = String.format("%.2f", data[1]);
-        String corrTime = (String)data[0];
+        String corrTime = (String) data[0];
         previewTimeLabel.setText(corrTime);
         corrLabel.setText(corr);
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -1108,7 +1112,6 @@ public class UserInterface extends javax.swing.JFrame {
             hundreds = Integer.parseInt((String) boxMS.getSelectedItem());
         }
         return String.format("%02d:%02d", sec, hundreds);
-        //return "" + sec + ":2%d"+hundreds;
     }
 
     private float p(String text) throws NumberFormatException {
@@ -1137,7 +1140,7 @@ public class UserInterface extends javax.swing.JFrame {
                     {null, null, null, null, null, null, null, null, null, null, null}
                 },
                 new String[]{
-                    "#", "Distance", "Time", "Corr. Time", "Corr.", "Date", "ºC top", "ºC middle", "ºC ice", "Atm.Press[hPa]", "R.H"
+                    "#", "Distance", "Time", "Corr. Time", "Subtract.", "Date", "ºC top", "ºC middle", "ºC ice", "Atm.Press[hPa]", "R.H"
                 }
         );
         return initialMod;
